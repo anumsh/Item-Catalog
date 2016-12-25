@@ -33,15 +33,17 @@ session = DBSession()
 # Create anti-forgery state token
 @app.route('/login')
 def showLogin():
+    print  "login"
     state = ''.join(random.choice(string.ascii_uppercase + string.digits)
                     for x in xrange(32))
     login_session['state'] = state
     # RENDER THE LOGIN TEMPLATE
-    return render_template('login.html')
+    return render_template('login.html',STATE=state)
 
 
-@app.route('/gconnect', methods=['GET','POST'])
+@app.route('/gconnect', methods=['POST'])
 def gconnect():
+    print "gconnect-----------"
     # Validate state token
     if request.args.get('state') != login_session['state']:
         response = make_response(json.dumps('Invalid state parameter.'), 401)
@@ -124,12 +126,11 @@ def gconnect():
     return output
 
     # DISCONNECT - Revoke a current user's token and reset their login_session
-
-
 @app.route('/gdisconnect')
 def gdisconnect():
     access_token = login_session.get('access_token')
     print 'In gdisconnect access token is %s', access_token
+    print login_session.keys()
     print 'User name is: '
     print login_session['username']
     if access_token is None:
